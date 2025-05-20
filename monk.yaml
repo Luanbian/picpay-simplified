@@ -1,0 +1,9 @@
+pre-commit:
+  commands:
+    - cargo set-version minor
+    - cargo fmt -- --check
+    - cargo clippy -- -D warnings
+
+pre-push:
+  commands:
+    - cargo test

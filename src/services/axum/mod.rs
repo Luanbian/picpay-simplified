@@ -21,7 +21,7 @@ async fn listener() -> TcpListener {
         .await
         .unwrap();
     println!("Server Listening on port {}", get_axum_port());
-    return listener;
+    listener
 }
 
 fn health_check(app: Router) -> Router {
