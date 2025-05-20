@@ -4,4 +4,3 @@ pub fn get_axum_port() -> u16 {
         .parse()
         .unwrap_or(3000)
 }
-
