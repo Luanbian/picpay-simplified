@@ -5,6 +5,7 @@ use tokio::net::TcpListener;
 use uuid::Uuid;
 
 mod types;
+use crate::constants::axum::get_axum_port;
 use types::{APIEcho, ApiResponse};
 
 pub async fn server() {
@@ -16,8 +17,10 @@ pub async fn server() {
 }
 
 async fn listener() -> TcpListener {
-    let listener = TcpListener::bind("0.0.0.0:3005").await.unwrap();
-    println!("Server Listening on port 3005");
+    let listener = TcpListener::bind(format!("0.0.0.0:{}", get_axum_port()))
+        .await
+        .unwrap();
+    println!("Server Listening on port {}", get_axum_port());
     return listener;
 }
 
