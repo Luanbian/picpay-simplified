@@ -1,6 +1,6 @@
 pre-commit:
   commands:
-    - cargo set-version minor
+    - cargo set-version --bump patch;
     - cargo fmt -- --check
     - cargo clippy -- -D warnings
 
