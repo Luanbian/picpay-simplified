@@ -8,8 +8,7 @@ mod types;
 use crate::constants::axum::get_axum_port;
 use types::{APIEcho, ApiResponse};
 
-pub async fn server() {
-    let app = Router::new();
+pub async fn server(app: Router) {
     let app = health_check(app);
     let listener = listener().await;
 
