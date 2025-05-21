@@ -1,3 +1,3 @@
 pub mod db;
 
-pub use db::main;
+pub use db::{create_shopman, get_shopman};

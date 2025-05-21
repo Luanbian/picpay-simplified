@@ -2,7 +2,8 @@ use crate::features::shopman::model;
 use axum::{Router, response::IntoResponse, routing::post};
 
 async fn shopman_create() -> impl IntoResponse {
-    model::main();
+    model::create_shopman().await.unwrap();
+    model::get_shopman().await.unwrap();
     println!("Shopman create");
 }
 

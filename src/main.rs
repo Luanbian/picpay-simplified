@@ -1,14 +1,18 @@
-mod services;
 use axum::Router;
-use services::axum::server;
+
 mod constants;
 use constants::load_env;
+mod services;
+use services::axum::server;
+use services::neo4rs::init_db;
 mod features;
 use features::shopman::controller::router as shopman_feature;
 
 #[tokio::main]
 async fn main() {
     load_env();
+
+    init_db().await.unwrap();
 
     let app = Router::new().nest("/api", Router::new().merge(shopman_feature()));
     server(app).await;
