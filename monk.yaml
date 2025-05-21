@@ -1,8 +1,8 @@
 pre-commit:
   commands:
-    - echo "Atualizando versão"
     - cargo set-version --bump patch
-    - git add Cargo.toml
+    - cargo update
+    - git add .
     - cargo fmt -- --check
     - cargo clippy -- -D warnings
 
