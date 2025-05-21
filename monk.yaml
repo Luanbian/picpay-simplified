@@ -2,9 +2,9 @@ pre-commit:
   commands:
     - cargo set-version --bump patch
     - cargo update
-    - git add .
     - cargo fmt -- --check
     - cargo clippy -- -D warnings
+    - git add .
 
 pre-push:
   commands:
