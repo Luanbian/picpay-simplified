@@ -4,7 +4,7 @@ use services::axum::server;
 mod constants;
 use constants::load_env;
 mod features;
-use features::shopman::router as shopman_feature;
+use features::shopman::controller::router as shopman_feature;
 
 #[tokio::main]
 async fn main() {
