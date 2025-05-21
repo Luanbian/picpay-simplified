@@ -4,7 +4,7 @@ use hostname::get as getHost;
 use tokio::net::TcpListener;
 use uuid::Uuid;
 
-mod types;
+pub mod types;
 use crate::constants::axum::get_axum_port;
 use types::{APIEcho, ApiResponse};
 
