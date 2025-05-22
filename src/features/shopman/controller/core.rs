@@ -1,5 +1,5 @@
-use crate::features::shopman::model;
 use crate::services::axum::types::ApiResponse;
+use crate::{features::shopman::model, services::bcrypt::encrypt};
 use axum::{
     Json, Router,
     http::StatusCode,
@@ -16,7 +16,7 @@ async fn create_shopman(Json(payload): Json<CreateShopmanPayload>) -> impl IntoR
         company: payload.company,
         cnpj: payload.cnpj,
         email: payload.email,
-        password: payload.password,
+        password: encrypt(&payload.password),
     };
 
     let result = model::create_shopman(shopman).await;

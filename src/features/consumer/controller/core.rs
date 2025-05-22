@@ -1,5 +1,5 @@
-use crate::features::consumer::model;
 use crate::services::axum::types::ApiResponse;
+use crate::{features::consumer::model, services::bcrypt::encrypt};
 use axum::{
     Json, Router,
     http::StatusCode,
@@ -16,7 +16,7 @@ async fn create_consumer(Json(payload): Json<CreateConsumerPayload>) -> impl Int
         name: payload.name,
         cpf: payload.cpf,
         email: payload.email,
-        password: payload.password,
+        password: encrypt(&payload.password),
         balance: None,
     };
 
