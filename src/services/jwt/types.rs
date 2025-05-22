@@ -4,4 +4,5 @@ use serde::{Deserialize, Serialize};
 pub struct JWTClaims {
     pub id: String,
     pub user: String,
+    pub exp: usize,
 }

@@ -1,8 +1,14 @@
 use crate::{
-    features::consumer::model::types::ConsumerSchema, features::deposit::model,
+    features::{
+        consumer::model::types::ConsumerSchema,
+        deposit::{middleware::check_is_consumer, model},
+    },
     services::axum::types::ApiResponse,
 };
-use axum::{Json, Router, extract::Path, http::StatusCode, response::IntoResponse, routing::post};
+use axum::{
+    Json, Router, extract::Path, http::StatusCode, middleware, response::IntoResponse,
+    routing::post,
+};
 use uuid::Uuid;
 
 use super::types::CreateDepositPayload;
@@ -43,5 +49,7 @@ async fn deposit(
 }
 
 pub fn router() -> Router {
-    Router::new().route("/{id}", post(deposit))
+    Router::new()
+        .route("/{id}", post(deposit))
+        .route_layer(middleware::from_fn(check_is_consumer))
 }
