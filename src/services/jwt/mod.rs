@@ -1,12 +1,16 @@
-use jsonwebtoken::{EncodingKey, Header, encode};
-
 use crate::constants::jwt::get_jwt_secret;
+use jsonwebtoken::{EncodingKey, Header, encode};
+pub mod types;
+use types::JWTClaims;
 
-#[allow(dead_code)]
-pub fn sign_jwt(payload: String) -> String {
+pub fn sign_jwt(id: &str, user: &str) -> String {
+    let claims = JWTClaims {
+        id: id.to_string(),
+        user: user.to_string(),
+    };
     encode(
         &Header::default(),
-        &payload,
+        &claims,
         &EncodingKey::from_secret(get_jwt_secret().as_bytes()),
     )
     .unwrap()

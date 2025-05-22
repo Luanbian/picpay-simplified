@@ -1,6 +1,6 @@
 use crate::{
     features::auth::model,
-    services::{axum::types::ApiResponse, bcrypt::verify_hash},
+    services::{axum::types::ApiResponse, bcrypt::verify_hash, jwt::sign_jwt},
 };
 use axum::{Json, Router, http::StatusCode, response::IntoResponse, routing::post};
 use uuid::Uuid;
@@ -34,12 +34,14 @@ async fn login(Json(payload): Json<LoginPayload>) -> impl IntoResponse {
         return (StatusCode::UNAUTHORIZED, Json(response));
     }
 
+    let token = sign_jwt(&user.id, &user.user);
+
     let response: ApiResponse<String, String> = ApiResponse {
         code: String::from("features:auth:login"),
         transaction: Uuid::new_v4().to_string(),
         message: String::from("Login Successfully"),
         args: None,
-        data: Some(String::from("token")),
+        data: Some(token),
     };
     (StatusCode::OK, Json(response))
 }
