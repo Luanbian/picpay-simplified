@@ -7,4 +7,5 @@ pub struct ConsumerSchema {
     pub cpf: String,
     pub email: String,
     pub password: String,
+    pub balance: Option<i64>,
 }

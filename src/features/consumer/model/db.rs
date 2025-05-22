@@ -36,6 +36,7 @@ pub async fn get_consumers() -> Result<Vec<ConsumerSchema>, Error> {
                 cpf: node.get("cpf").unwrap(),
                 email: node.get("email").unwrap(),
                 password: node.get("password").unwrap(),
+                balance: node.get("balance").unwrap_or(None),
             }
         })
         .try_collect()

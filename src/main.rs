@@ -7,6 +7,7 @@ use services::axum::server;
 use services::neo4rs::init_db;
 mod features;
 use features::consumer::controller::router as consumer_feature;
+use features::deposit::controller::router as deposit_feature;
 use features::shopman::controller::router as shopman_feature;
 
 #[tokio::main]
@@ -19,7 +20,8 @@ async fn main() {
         "/api",
         Router::new()
             .merge(shopman_feature())
-            .merge(consumer_feature()),
+            .merge(consumer_feature())
+            .merge(deposit_feature()),
     );
     server(app).await;
 }
