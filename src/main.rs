@@ -6,6 +6,7 @@ mod services;
 use services::axum::server;
 use services::neo4rs::init_db;
 mod features;
+use features::auth::controller::router as auth_feature;
 use features::consumer::controller::router as consumer_feature;
 use features::deposit::controller::router as deposit_feature;
 use features::shopman::controller::router as shopman_feature;
@@ -21,7 +22,8 @@ async fn main() {
         Router::new()
             .merge(shopman_feature())
             .merge(consumer_feature())
-            .merge(deposit_feature()),
+            .merge(deposit_feature())
+            .merge(auth_feature()),
     );
     server(app).await;
 }
