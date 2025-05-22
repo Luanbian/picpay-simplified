@@ -18,6 +18,7 @@ async fn create_consumer(Json(payload): Json<CreateConsumerPayload>) -> impl Int
         email: payload.email,
         password: encrypt(&payload.password),
         balance: None,
+        user: String::from("consumer"),
     };
 
     let result = model::create_consumer(consumer).await;

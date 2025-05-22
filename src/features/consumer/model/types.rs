@@ -8,4 +8,5 @@ pub struct ConsumerSchema {
     pub email: String,
     pub password: String,
     pub balance: Option<i64>,
+    pub user: String,
 }

@@ -17,6 +17,8 @@ async fn create_shopman(Json(payload): Json<CreateShopmanPayload>) -> impl IntoR
         cnpj: payload.cnpj,
         email: payload.email,
         password: encrypt(&payload.password),
+        balance: None,
+        user: String::from("shopman"),
     };
 
     let result = model::create_shopman(shopman).await;

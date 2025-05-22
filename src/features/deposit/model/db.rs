@@ -23,6 +23,7 @@ pub async fn create_deposit(deposit: DepositSchema) -> Result<ConsumerSchema, Er
             email: node.get("email").unwrap(),
             password: node.get("password").unwrap(),
             balance: node.get("balance").unwrap_or(None),
+            user: node.get("user").unwrap(),
         };
         Ok(consumer)
     } else {
