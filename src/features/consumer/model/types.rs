@@ -10,3 +10,12 @@ pub struct ConsumerSchema {
     pub balance: Option<i64>,
     pub user: String,
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct TransactionConsumerSchema {
+    pub id: String,
+    pub from: String,
+    pub to: String,
+    pub amount: i64,
+    pub when: String,
+}

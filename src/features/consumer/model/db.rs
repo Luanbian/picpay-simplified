@@ -2,7 +2,7 @@ use crate::services::neo4rs::get_db;
 use futures::TryStreamExt;
 use neo4rs::{Error, Node, query};
 
-use super::types::ConsumerSchema;
+use super::types::{ConsumerSchema, TransactionConsumerSchema};
 
 pub async fn create_consumer(consumer: ConsumerSchema) -> Result<String, Error> {
     let db = get_db().await.unwrap();
@@ -46,4 +46,22 @@ pub async fn get_consumers() -> Result<Vec<ConsumerSchema>, Error> {
         .await?;
 
     Ok(consumers)
+}
+
+pub async fn create_transaction(
+    transaction: TransactionConsumerSchema,
+) -> Result<TransactionConsumerSchema, Error> {
+    let db = get_db().await.unwrap();
+
+    db.run(
+        query("MATCH (c:Consumer {id: $from}) MATCH (s:Shopman {id: $to}) CREATE (c)-[:CUSTOMER_TRANSACTION {id: $id, amount: $amount, when: $when}]->(s)")
+            .param("from", transaction.from.clone())
+            .param("to", transaction.to.clone())
+            .param("id", transaction.id.clone())
+            .param("amount", transaction.amount)
+            .param("when", transaction.when.clone()), 
+    )
+    .await?;
+
+    Ok(transaction)
 }

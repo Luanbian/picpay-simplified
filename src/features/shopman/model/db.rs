@@ -47,3 +47,33 @@ pub async fn get_shopman() -> Result<Vec<ShopmanSchema>, Error> {
 
     Ok(shopmen)
 }
+
+pub async fn find_shopman_by_id(id: String) -> Option<ShopmanSchema> {
+    let db = get_db().await?;
+
+    let result = db
+        .execute(query("MATCH (s:Shopman {id: $id}) RETURN s").param("id", id))
+        .await
+        .unwrap();
+
+    let shopman: Vec<ShopmanSchema> = result
+        .into_stream()
+        .map_ok(|row| {
+            let node: Node = row.get("s").unwrap();
+
+            ShopmanSchema {
+                id: node.get("id").unwrap(),
+                company: node.get("company").unwrap(),
+                cnpj: node.get("cnpj").unwrap(),
+                email: node.get("email").unwrap(),
+                password: node.get("password").unwrap(),
+                balance: node.get("balance").unwrap_or(None),
+                user: node.get("user").unwrap(),
+            }
+        })
+        .try_collect()
+        .await
+        .unwrap_or_default();
+
+    shopman.into_iter().next()
+}
