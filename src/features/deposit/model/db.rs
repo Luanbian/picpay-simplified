@@ -7,7 +7,7 @@ pub async fn create_deposit(deposit: DepositSchema) -> Result<ConsumerSchema, Er
 
     let mut result = db
         .execute(
-            query("MATCH (c:Consumer {id: $id}) SET c.balance = $value RETURN c")
+            query("MATCH (c:Consumer {id: $id}) SET c.balance = c.balance + $value RETURN c")
                 .param("id", deposit.id)
                 .param("value", deposit.value),
         )
