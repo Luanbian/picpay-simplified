@@ -54,14 +54,41 @@ pub async fn create_transaction(
     let db = get_db().await.unwrap();
 
     db.run(
-        query("MATCH (c:Consumer {id: $from}) MATCH (s:Shopman {id: $to}) CREATE (c)-[:CUSTOMER_TRANSACTION {id: $id, amount: $amount, when: $when}]->(s)")
-            .param("from", transaction.from.clone())
-            .param("to", transaction.to.clone())
-            .param("id", transaction.id.clone())
-            .param("amount", transaction.amount)
-            .param("when", transaction.when.clone()), 
+        query(
+            "MATCH (c:Consumer {id: $from}), MATCH (s:Shopman {id: $to}) \
+            CREATE (c)-[:CUSTOMER_TRANSACTION {id: $id, amount: $amount, when: $when}]->(s) \
+            SET s.balance = s.balance + $amount \
+            SET c.balance = c.balance - $amount",
+        )
+        .param("from", transaction.from.clone())
+        .param("to", transaction.to.clone())
+        .param("id", transaction.id.clone())
+        .param("amount", transaction.amount)
+        .param("when", transaction.when.clone()),
     )
     .await?;
 
     Ok(transaction)
+}
+
+pub async fn validate_balance(id: String, amount: i64) -> Result<bool, Error> {
+    let db = get_db().await.unwrap();
+
+    let result = db
+        .execute(query("MATCH (s:Consumer {id: $id}) RETURN s.balance").param("id", id))
+        .await?;
+
+    let balances: Vec<Option<i64>> = result
+        .into_stream()
+        .map_ok(|row| {
+            let node: Node = row.get("s").unwrap();
+            node.get::<i64>("balance").ok()
+        })
+        .try_collect()
+        .await?;
+
+    Ok(balances
+        .first()
+        .and_then(|balance_opt| *balance_opt)
+        .is_some_and(|balance| balance >= amount))
 }

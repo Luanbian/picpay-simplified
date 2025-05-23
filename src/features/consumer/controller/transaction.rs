@@ -22,11 +22,37 @@ async fn transaction(Json(payload): Json<TransactionPayload>) -> impl IntoRespon
         }
     };
 
+    let amount = (payload.amount * 100.0) as i64;
+    let has_sufficient_balance = match model::validate_balance(payload.from.clone(), amount).await {
+        Ok(balance) => balance,
+        Err(err) => {
+            let response: ApiResponse<TransactionConsumerSchema, String> = ApiResponse {
+                code: String::from("features.consumer.transaction"),
+                transaction: Uuid::new_v4().to_string(),
+                message: String::from("Verify balance failed"),
+                data: None::<TransactionConsumerSchema>,
+                args: Some(err.to_string()),
+            };
+            return (StatusCode::INTERNAL_SERVER_ERROR, Json(response));
+        }
+    };
+
+    if !has_sufficient_balance {
+        let response: ApiResponse<TransactionConsumerSchema, String> = ApiResponse {
+            code: String::from("features.consumer.transaction"),
+            transaction: Uuid::new_v4().to_string(),
+            message: String::from("Transaction customer failed"),
+            data: None::<TransactionConsumerSchema>,
+            args: Some(String::from("Insufficient balance")),
+        };
+        return (StatusCode::BAD_REQUEST, Json(response));
+    }
+
     let transaction = TransactionConsumerSchema {
         id: Uuid::new_v4().to_string(),
         from: payload.from,
         to: shopman.id,
-        amount: (payload.amount * 100.0) as i64,
+        amount,
         when: Utc::now().to_rfc3339().to_string(),
     };
 
