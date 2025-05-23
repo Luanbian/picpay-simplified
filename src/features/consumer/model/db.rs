@@ -55,10 +55,10 @@ pub async fn create_transaction(
 
     db.run(
         query(
-            "MATCH (c:Consumer {id: $from}), MATCH (s:Shopman {id: $to}) \
+            "MATCH (c:Consumer {id: $from}), (s:Shopman {id: $to}) \
             CREATE (c)-[:CUSTOMER_TRANSACTION {id: $id, amount: $amount, when: $when}]->(s) \
-            SET s.balance = s.balance + $amount \
-            SET c.balance = c.balance - $amount",
+            SET s.balance = coalesce(s.balance, 0) + $amount \
+            SET c.balance = coalesce(c.balance, 0) - $amount",
         )
         .param("from", transaction.from.clone())
         .param("to", transaction.to.clone())
@@ -78,17 +78,11 @@ pub async fn validate_balance(id: String, amount: i64) -> Result<bool, Error> {
         .execute(query("MATCH (s:Consumer {id: $id}) RETURN s.balance").param("id", id))
         .await?;
 
-    let balances: Vec<Option<i64>> = result
+    let balances: Vec<i64> = result
         .into_stream()
-        .map_ok(|row| {
-            let node: Node = row.get("s").unwrap();
-            node.get::<i64>("balance").ok()
-        })
+        .map_ok(|row| row.get::<i64>("s.balance").unwrap_or(0))
         .try_collect()
         .await?;
 
-    Ok(balances
-        .first()
-        .and_then(|balance_opt| *balance_opt)
-        .is_some_and(|balance| balance >= amount))
+    Ok(balances.first().is_some_and(|&balance| balance >= amount))
 }
